@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Loan Recovery</title>
   <style>
     body {
@@ -10,38 +10,113 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      justify-content: flex-start;
+      padding: 40px 20px;
     }
     h1 {
       color: #333;
+      margin-bottom: 20px;
     }
-    input {
-      padding: 10px;
-      font-size: 18px;
+    input, button {
+      padding: 12px;
+      font-size: 16px;
       width: 300px;
+      margin-top: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .hidden {
+      display: none;
+    }
+    .message {
       margin-top: 20px;
+      font-weight: bold;
+    }
+    #qr-container {
+      margin-top: 30px;
+      text-align: center;
+    }
+    canvas {
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
+
   <h1>Loan Recovery</h1>
+
+  <!-- Amount Entry -->
   <input
     type="number"
     id="amount"
     placeholder="Enter the amount you want to pay"
-    oninput="redirectToUPI(this.value)"
   />
+  <button onclick="redirectToUPI()">Pay Now</button>
+
+  <!-- UPI QR Code -->
+  <div id="qr-container">
+    <p>Or scan this UPI QR code to pay:</p>
+    <canvas id="qrcode"></canvas>
+  </div>
+
+  <!-- UTR Entry -->
+  <div id="utrSection" class="hidden">
+    <input
+      type="text"
+      id="utr"
+      placeholder="Enter your UTR number after payment"
+    />
+    <button onclick="verifyUTR()">Submit UTR</button>
+  </div>
+
+  <div id="message" class="message"></div>
+
+  <!-- QR Generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
   <script>
-    function redirectToUPI(value) {
-      if (value && parseFloat(value) > 0) {
-        const upiID = "hussainmajeda61@okaxis";
-        const name = "Loan%20Recovery";
-        const url = `upi://pay?pa=${upiID}&pn=${name}&am=${value}`;
+    const upiID = "hussainmajeda61@okaxis";
+    const name = "Loan%20Recovery";
+
+    // Generate UPI QR code
+    const upiLink = `upi://pay?pa=${upiID}&pn=${name}`;
+    QRCode.toCanvas(document.getElementById('qrcode'), upiLink, { width: 200 }, function (error) {
+      if (error) console.error(error);
+    });
+
+    function redirectToUPI() {
+      const amount = document.getElementById("amount").value;
+      if (amount && parseFloat(amount) > 0) {
+        const url = `upi://pay?pa=${upiID}&pn=${name}&am=${amount}`;
+        document.getElementById("utrSection").classList.remove("hidden");
         window.location.href = url;
+      } else {
+        alert("Please enter a valid amount.");
+      }
+    }
+
+    function verifyUTR() {
+      const utr = document.getElementById("utr").value.trim();
+      const message = document.getElementById("message");
+
+      if (utr.length >= 10) {
+        message.style.color = "green";
+        message.textContent = "✅ Thank you! Your payment is being verified.";
+        localStorage.setItem("lastUTR", utr);
+      } else {
+        message.style.color = "red";
+        message.textContent = "❌ Please enter a valid UTR number.";
       }
     }
   </script>
+
 </body>
 </html>
