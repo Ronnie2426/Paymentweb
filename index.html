@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loan Recovery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    h1 {
+      color: #333;
+    }
+    input {
+      padding: 10px;
+      font-size: 18px;
+      width: 300px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Loan Recovery</h1>
+  <input
+    type="number"
+    id="amount"
+    placeholder="Enter the amount you want to pay"
+    oninput="redirectToUPI(this.value)"
+  />
+
+  <script>
+    function redirectToUPI(value) {
+      if (value && parseFloat(value) > 0) {
+        const upiID = "hussainmajeda61@okaxis";
+        const name = "Loan%20Recovery";
+        const url = `upi://pay?pa=${upiID}&pn=${name}&am=${value}`;
+        window.location.href = url;
+      }
+    }
+  </script>
+</body>
+</html>
